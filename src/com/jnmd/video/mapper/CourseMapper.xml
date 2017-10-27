@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace：命名空间，用于隔离sql，还有一个很重要的作用，后面会讲 -->
+<mapper namespace="com.jnmd.video.mapper.CourseMapper">
+
+  <resultMap type="course" id="courseMapId">
+     <result column="course_title" property="courseTitle"/>
+     <result column="subject_id" property="subjectId"/>
+     <result column="course_desc" property="courseDesc"/>
+  </resultMap>
+  
+  <select id="findCourseAll" resultMap="courseMapId">
+     select * from course
+  </select>
+  
+  <select id="findCourseBySubjectId" parameterType="int" resultMap="courseMapId">
+      select * from course where subject_id=#{subjectId}
+  </select>
+  
+  <select id="selectCourseById" parameterType="int" resultMap="courseMapId">
+    select * from course where id=#{courseId}
+  </select>
+
+</mapper>

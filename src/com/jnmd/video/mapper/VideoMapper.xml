@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace：命名空间，用于隔离sql，还有一个很重要的作用，后面会讲 -->
+<mapper namespace="com.jnmd.video.mapper.VideoMapper">
+
+  <resultMap type="video" id="videoMapId">
+     <result column="play_num" property="playNum"/>
+     <result column="spearker_id" property="spearkerId"/>
+     <result column="course_id" property="courseId"/>
+     <result column="image_url" property="imageUrl"/>
+     <result column="video_url" property="videoUrl"/>
+     <result column="speaker_name" property="speakerName"/>
+  </resultMap>
+  
+  <select id="selectVideoAll" resultMap="videoMapId">
+     select * from video
+  </select>
+  
+  <!-- sql片段  可以重复利用-->
+  <sql id="selectVo">
+      
+       <where><!-- where标签可以去掉第一个sql片段中的and -->
+          <if test="null != title and title!='' ">
+           and title like "%"#{title}"%"
+	     </if>
+	     <if test="null !=spearkerId and spearkerId!=0">
+	       and  spearker_id =#{spearkerId}
+	     </if>
+	     <if test="null != courseId and courseId!=0">
+	       and  course_id =#{courseId}
+	     </if>
+     
+     </where>
+  
+  </sql>
+  
+  <select id="selectVideoByVo" resultMap="videoMapId" parameterType="VideoQueryVo">
+     select * from video  v left join speaker s
+     on v.spearker_id=s.id
+     <include refid="selectVo"/>
+     limit #{begin},#{rows}
+  </select>
+  
+  
+  
+  <select id="selectVideoById" resultMap="videoMapId" parameterType="int">
+     select * from video  v
+      where v.id=#{id}
+  </select>
+  
+  <update id="updateVideo" parameterType="video">
+     update video set title=#{title},detail=#{detail},time=#{time},image_url=#{imageUrl},video_url=#{videoUrl}
+       ,spearker_id=#{spearkerId},course_id=#{courseId}
+      where id=#{id}
+  </update>
+  
+  <insert id="saveVideo"  parameterType="video">
+        insert into video (title,detail,time,spearker_id,course_id,video_url,image_url,play_num)
+			values(#{title},#{detail},#{time},#{spearkerId},#{courseId},#{videoUrl},#{imageUrl},#{playNum})
+  </insert>
+  
+  <delete id="deleteVideoById" parameterType="int">
+     delete from video where id=#{id}
+  </delete>
+  
+  <delete id="batchDeleteByVo" parameterType="batchDeleteVo">
+      delete from video  where id in 
+      <foreach collection="ids" item="id" open="(" close=")" separator=",">
+         #{id}
+      </foreach>
+  </delete>
+  
+  <select id="getCountVideo" resultType="int" parameterType="VideoQueryVo">
+     select count(1) from video
+     <include refid="selectVo"/>
+  </select>
+  
+  <select id="findVideoByCourseId" parameterType="int" resultMap="videoMapId">
+     select v.*,s.speaker_name from video v left join speaker s on v.spearker_id=s.id where course_id=#{courseId}
+  </select>
+  
+  
+
+</mapper>
